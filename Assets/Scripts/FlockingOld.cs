@@ -19,6 +19,8 @@ public class FlockingOld : MonoBehaviour
     [SerializeField] private float _entitiesVelocityLimit;
     [SerializeField] private int _sourceEntitiesCount = 50;
 
+    [SerializeField] private Transform _pointOfInterest;
+    
     public float driveFactor = 10f;
     public float maxSpeed = 5f;
     
@@ -126,14 +128,30 @@ public class FlockingOld : MonoBehaviour
         CohesionJob cohesionJob = new CohesionJob(
             _entitiesPositions,
             _entitiesAccelerations);
+
+        PointOfInterestJob pointOfInterestJob = new PointOfInterestJob(
+            _entitiesPositions, 
+            _entitiesAccelerations, 
+            new AccelerationWeights(1.0f, 1.0f, 1.0f, 0.1f),
+            _pointOfInterest.position);
         
         Debug.Log("count: " + _entitiesCount);
 
         JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 4); 
         
         JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, cohesionJobHandle);
-        moveJobHandle.Complete();
+
+        JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
+        pointOfInterestJobHandle.Complete();
         
+        /*foreach (Vector3 position in _entitiesPositions)
+        {
+            if (Vector3.Distance(position, _pointOfInterest.position) <= 1.0f)
+            {
+                _pointOfInterest.position = Random.insideUnitSphere * 30.0f;
+                break;
+            }
+        }*/
     }
 
     private void Detect()

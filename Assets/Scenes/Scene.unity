@@ -477,6 +477,7 @@ MonoBehaviour:
   _entityPrefab: {fileID: 6500178819360376908, guid: 8171d39bbdcf6d343aac267c12469329, type: 3}
   _entitiesVelocityLimit: 3
   _sourceEntitiesCount: 100
+  _pointOfInterest: {fileID: 39560361}
   driveFactor: 10
   maxSpeed: 5
 --- !u!1 &1594266755
