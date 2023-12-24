@@ -37,11 +37,14 @@ public class FlockingOld : MonoBehaviour
     
     private NativeArray<SpherecastCommand> _detectionCommands;
 
+    private Transform[] _entitiesTransforms; 
+    
     private void Start()
     {
-        Transform[] entitiesTransforms = new Transform[_sourceEntitiesCount];
+        _entitiesCount = _sourceEntitiesCount;
+        _entitiesTransforms = new Transform[_maxEntitiesCount];
 
-        for (int i = 0; i < entitiesTransforms.Length; i++)
+        for (int i = 0; i < _entitiesCount; i++)
         {
             GameObject entity = Instantiate(_entityPrefab, 
                 Random.insideUnitSphere * _sourceEntitiesCount * Density,
@@ -49,17 +52,19 @@ public class FlockingOld : MonoBehaviour
                 transform);
 
             entity.name = "entity_" + i;
-            entitiesTransforms[i] = entity.transform;
+            _entitiesTransforms[i] = entity.transform;
         }
 
-        _transformAccessArray = new TransformAccessArray(entitiesTransforms);
-        _entitiesCount = _sourceEntitiesCount;
+        _transformAccessArray = new TransformAccessArray(_entitiesTransforms);
+        
         
         
         _entitiesPositions = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
         
         for (int i = 0; i < _entitiesCount; i++)
         {
+            Debug.Log("Iteration: " + i);
+            
             _entitiesPositions[i] = _transformAccessArray[i].position;
         }
 
@@ -72,9 +77,36 @@ public class FlockingOld : MonoBehaviour
         
         _entitiesAccelerations = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
     }
-
-    private void Reproduction()
+    
+    private void Reproduction(int entitiesCountAppend)
     {
+        int newEntitiesCount = _entitiesCount + entitiesCountAppend;
+        
+        for (int i = _entitiesCount; i < newEntitiesCount; i++)
+        {
+            GameObject entity = Instantiate(_entityPrefab, 
+                Random.insideUnitSphere * entitiesCountAppend * Density,
+                Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
+                transform);
+
+            entity.name = $"entity_{i}_generated_";
+            _entitiesTransforms[i] = entity.transform;
+        }
+
+        for (int i = _entitiesCount; i < newEntitiesCount; i++)
+        {
+            _transformAccessArray[i] = _entitiesTransforms[i];
+        }
+        
+        for (int i = _entitiesCount; i < newEntitiesCount; i++)
+        {
+            _entitiesPositions[i] = _transformAccessArray[i].position;
+        }
+        
+        for (int i = _entitiesCount; i < newEntitiesCount; i++)
+        {
+            _entitiesVelocities[i] = Random.insideUnitSphere;
+        }
         
     }
 
