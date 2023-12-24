@@ -1,3 +1,4 @@
+using Models;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -13,10 +14,10 @@ namespace BoidsLogic
 
         private const float ConsumeRadius = 0.5f;
 
-        [NativeDisableParallelForRestriction] private NativeArray<Vector3> _pointsOfInterest;
+        [NativeDisableParallelForRestriction] private NativeArray<PointOfInterest> _pointsOfInterest;
 
         public PointOfInterestJob(NativeArray<Vector3> positions, NativeArray<Vector3> accelerations, 
-            AccelerationWeights weights, Vector3 interestPosition, NativeArray<Vector3> pointsOfInterest)
+            AccelerationWeights weights, Vector3 interestPosition, NativeArray<PointOfInterest> pointsOfInterest)
         {
             _positions = positions;
             _accelerations = accelerations;
@@ -30,26 +31,34 @@ namespace BoidsLogic
             /*Vector3 acceleration = _interestPosition - _positions[index];
             _accelerations[index] += _weights.PointOfInterest * acceleration;*/
 
+            if (_pointsOfInterest.Length == 0)
+            {
+                Debug.Log("Zero");
+                return;
+            }
+            
             float minDistance = float.MaxValue;
-            int chosePointIndex = 0;
+            int chosenPointIndex = 0;
             
             for (int i = 0; i < _pointsOfInterest.Length; i++)
             {
-                float distanceToPoint = Vector3.Distance(_positions[index], _pointsOfInterest[i]);
+                float distanceToPoint = Vector3.Distance(_positions[index], _pointsOfInterest[i].Position);
                 
                 if (distanceToPoint < minDistance)
                 {
                     minDistance = distanceToPoint;
-                    chosePointIndex = i;
+                    chosenPointIndex = i;
                 }
             }
 
-            if (Vector3.Distance(_positions[index], _pointsOfInterest[chosePointIndex]) < ConsumeRadius)
+            if (Vector3.Distance(_positions[index], _pointsOfInterest[chosenPointIndex].Position) < ConsumeRadius)
             {
+                PointOfInterest cachedPoint = _pointsOfInterest[chosenPointIndex];
+                _pointsOfInterest[chosenPointIndex] = new PointOfInterest(cachedPoint.Id, cachedPoint.Position, true);
                 Debug.Log("Consumed");
             }
 
-            Vector3 acceleration = _pointsOfInterest[chosePointIndex] - _positions[index];
+            Vector3 acceleration = _pointsOfInterest[chosenPointIndex].Position - _positions[index];
             _accelerations[index] += _weights.PointOfInterest * acceleration;
             
         }

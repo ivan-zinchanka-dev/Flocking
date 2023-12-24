@@ -2,6 +2,7 @@
 using System.Linq;
 using BoidsLogic;
 using Jobs;
+using Models;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -28,7 +29,7 @@ public class FlockingOld : MonoBehaviour
 
     private Transform[] _entitiesTransforms;
 
-    private NativeArray<Vector3> _pointsOfInterest;
+    private NativeArray<PointOfInterest> _pointsOfInterest;
 
     private InterestsManager _interestsManager;
     
@@ -41,11 +42,12 @@ public class FlockingOld : MonoBehaviour
     {
         if (_pointsOfInterest.IsCreated)
         {
+            _interestsManager.UpdatePointsOfInterest(_pointsOfInterest);
             _pointsOfInterest.Dispose();
         }
         
-        _pointsOfInterest = new NativeArray<Vector3>(_interestsManager.PointsOfInterest.Select(point=>point.position)
-                .ToArray(), Allocator.Persistent);
+        _pointsOfInterest = _interestsManager.GetPointsOfInterest();
+        Debug.Log("Gotten array lenght: " + _pointsOfInterest.Length);
     }
 
     private void Start()
