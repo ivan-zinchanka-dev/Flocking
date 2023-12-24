@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+﻿using System.Collections.Generic;
 using BoidsLogic;
 using Jobs;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Jobs;
-using UnityEngine.Serialization;
 using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
@@ -57,14 +53,10 @@ public class FlockingOld : MonoBehaviour
 
         _transformAccessArray = new TransformAccessArray(_entitiesTransforms);
         
-        
-        
         _entitiesPositions = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
         
         for (int i = 0; i < _entitiesCount; i++)
         {
-            Debug.Log("Iteration: " + i);
-            
             _entitiesPositions[i] = _transformAccessArray[i].position;
         }
 
@@ -77,10 +69,16 @@ public class FlockingOld : MonoBehaviour
         
         _entitiesAccelerations = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
     }
+
+    [EasyButtons.Button]
+    private void Add3()
+    {
+        Reproduction(3);
+    }
     
     private void Reproduction(int entitiesCountAppend)
     {
-        int newEntitiesCount = _entitiesCount + entitiesCountAppend;
+        int newEntitiesCount = Mathf.Clamp(_entitiesCount + entitiesCountAppend, 0, _maxEntitiesCount);
         
         for (int i = _entitiesCount; i < newEntitiesCount; i++)
         {
@@ -107,7 +105,8 @@ public class FlockingOld : MonoBehaviour
         {
             _entitiesVelocities[i] = Random.insideUnitSphere;
         }
-        
+
+        _entitiesCount = newEntitiesCount;
     }
 
 
