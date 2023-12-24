@@ -21,8 +21,10 @@ namespace Jobs
         public void Execute(int index)
         {
             Vector3 averagePosition = Vector3.zero;
+            Vector3 averageAvoidPosition = Vector3.zero;
             Vector3 self = _positions[index];
             int neighboursCount = 0;
+            int avoidableNeighboursCount = 0;
             
             for (int i = 0; i < _positions.Length; i++)
             {
@@ -33,16 +35,29 @@ namespace Jobs
                 
                 
                 Vector3 other = _positions[i];
-                
-                if (Vector3.Distance(self, other) < CoverageRadius)
+
+                if (Vector3.Distance(self, other) < ThresholdRadius)
+                {
+                    averageAvoidPosition += self - other;
+                    avoidableNeighboursCount++;
+                }
+                else if (Vector3.Distance(self, other) < CoverageRadius)
                 {
                     averagePosition += other;
                     neighboursCount++;
                 }
             }
 
-            averagePosition /= neighboursCount;
-            _accelerations[index] += averagePosition - self;
+            if (neighboursCount > 0)
+            {
+                averagePosition /= neighboursCount;
+                _accelerations[index] += averagePosition - self;
+            }
+            
+            if (avoidableNeighboursCount > 0)
+            {
+                _accelerations[index] += averageAvoidPosition / avoidableNeighboursCount;
+            }
 
         }
     }
