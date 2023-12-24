@@ -27,6 +27,8 @@ public class FlockingOld : MonoBehaviour
     private const float Density = 0.08f;
     private int _entitiesCount;
     
+    private int _maxEntitiesCount = 1000;
+    
     private TransformAccessArray _transformAccessArray;
     
     private NativeArray<Vector3> _entitiesPositions;
@@ -54,33 +56,26 @@ public class FlockingOld : MonoBehaviour
         _entitiesCount = _sourceEntitiesCount;
         
         
-        _entitiesPositions = new NativeArray<Vector3>(_entitiesCount, Allocator.Persistent);
+        _entitiesPositions = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
         
-        for (int i = 0; i < _entitiesPositions.Length; i++)
+        for (int i = 0; i < _entitiesCount; i++)
         {
             _entitiesPositions[i] = _transformAccessArray[i].position;
-            //Debug.Log("io: " + _entitiesPositions[i]);
         }
 
-        _entitiesVelocities = new NativeArray<Vector3>(_entitiesCount, Allocator.Persistent);
+        _entitiesVelocities = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
         
-        for (int i = 0; i < _entitiesVelocities.Length; i++)
+        for (int i = 0; i < _entitiesCount; i++)
         {
             _entitiesVelocities[i] = Random.insideUnitSphere;
-            //Debug.Log("io: " + _entitiesPositions[i]);
         }
+        
+        _entitiesAccelerations = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
+    }
 
+    private void Reproduction()
+    {
         
-        
-        _entitiesAccelerations = new NativeArray<Vector3>(_entitiesCount, Allocator.Persistent);
-        
-        /*_detectionCommands = new NativeArray<SpherecastCommand>(_entitiesCount, Allocator.Persistent);
-        
-        for (int i = 0; i < _detectionCommands.Length; i++)
-        {
-            _detectionCommands[i] = new SpherecastCommand(_entitiesPositions[i], 100.5f, Vector3.one, 1.0f);
-            //Debug.Log("io: " + _entitiesPositions[i]);
-        }*/
     }
 
 
@@ -126,6 +121,7 @@ public class FlockingOld : MonoBehaviour
             _entitiesVelocityLimit);
 
         CohesionJob cohesionJob = new CohesionJob(
+            _entitiesCount,
             _entitiesPositions,
             _entitiesAccelerations);
 
