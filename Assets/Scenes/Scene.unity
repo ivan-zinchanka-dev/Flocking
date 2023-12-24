@@ -423,7 +423,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.097698465, y: -0, z: -0, w: 0.9952161}
-  m_LocalPosition: {x: 0, y: 6.46, z: -35.7}
+  m_LocalPosition: {x: 0, y: 6.46, z: -23.54}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -446,7 +446,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1463706992
 Transform:
   m_ObjectHideFlags: 0
@@ -469,12 +469,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1463706991}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c2ea73f369247fe900cbe93ae4344fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _entityPrefab: {fileID: 6500178819360376908, guid: 8171d39bbdcf6d343aac267c12469329, type: 3}
+  _entitiesVelocityLimit: 3
   _sourceEntitiesCount: 100
   driveFactor: 10
   maxSpeed: 5
@@ -494,7 +495,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1594266756
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -509,12 +510,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _entityPrefab: {fileID: 6500178819360376908, guid: 8171d39bbdcf6d343aac267c12469329, type: 3}
   _entitiesNumber: 700
-  _entitiesDestinationThreshold: 15
+  _entitiesDestinationThreshold: 1
   _entitiesVelocityLimit: 3
   _accelerationWeights:
     AverageSpread: 5
-    AverageVelocity: 0.4
-    AveragePosition: 0.01
+    AverageVelocity: 0.2
+    AveragePosition: 0.2
     PointOfInterest: 0.1
   _pointOfInterest: {fileID: 39560361}
   _entitiesMovingBounds:

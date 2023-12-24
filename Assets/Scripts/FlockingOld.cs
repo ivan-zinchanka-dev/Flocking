@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using BoidsLogic;
 using Jobs;
 using Unity.Collections;
 using Unity.Jobs;
@@ -15,7 +16,7 @@ using Vector3 = UnityEngine.Vector3;
 public class FlockingOld : MonoBehaviour
 {
     [SerializeField] private GameObject _entityPrefab;
-    
+    [SerializeField] private float _entitiesVelocityLimit;
     [SerializeField] private int _sourceEntitiesCount = 50;
 
     public float driveFactor = 10f;
@@ -27,6 +28,9 @@ public class FlockingOld : MonoBehaviour
     private TransformAccessArray _transformAccessArray;
     
     private NativeArray<Vector3> _entitiesPositions;
+    private NativeArray<Vector3> _entitiesVelocities;
+    private NativeArray<Vector3> _entitiesAccelerations;
+    
     private NativeArray<SpherecastCommand> _detectionCommands;
 
     private void Start()
@@ -56,13 +60,25 @@ public class FlockingOld : MonoBehaviour
             //Debug.Log("io: " + _entitiesPositions[i]);
         }
 
-        _detectionCommands = new NativeArray<SpherecastCommand>(_entitiesCount, Allocator.Persistent);
+        _entitiesVelocities = new NativeArray<Vector3>(_entitiesCount, Allocator.Persistent);
+        
+        for (int i = 0; i < _entitiesVelocities.Length; i++)
+        {
+            _entitiesVelocities[i] = Random.insideUnitSphere;
+            //Debug.Log("io: " + _entitiesPositions[i]);
+        }
+
+        
+        
+        _entitiesAccelerations = new NativeArray<Vector3>(_entitiesCount, Allocator.Persistent);
+        
+        /*_detectionCommands = new NativeArray<SpherecastCommand>(_entitiesCount, Allocator.Persistent);
         
         for (int i = 0; i < _detectionCommands.Length; i++)
         {
             _detectionCommands[i] = new SpherecastCommand(_entitiesPositions[i], 100.5f, Vector3.one, 1.0f);
             //Debug.Log("io: " + _entitiesPositions[i]);
-        }
+        }*/
     }
 
 
@@ -90,7 +106,7 @@ public class FlockingOld : MonoBehaviour
             results.Dispose();
         }*/
 
-        Detect();
+        //Detect();
 
         /*DetectNearbyEntitiesJob detectNearbyJob = new DetectNearbyEntitiesJob(1.5f, _entitiesPositions);
         //MotionJob motionJob = new MotionJob(_entitiesPositions);
@@ -99,6 +115,25 @@ public class FlockingOld : MonoBehaviour
         //JobHandle motionJobHandle = motionJob.Schedule(_transformAccessArray, detectNearbyJobHandle);
         
         detectNearbyJobHandle.Complete();*/
+        
+        MoveJob moveJob = new MoveJob(
+            _entitiesPositions, 
+            _entitiesVelocities, 
+            _entitiesAccelerations, 
+            Time.deltaTime, 
+            _entitiesVelocityLimit);
+
+        CohesionJob cohesionJob = new CohesionJob(
+            _entitiesPositions,
+            _entitiesAccelerations);
+        
+        Debug.Log("count: " + _entitiesCount);
+
+        JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 4); 
+        
+        JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, cohesionJobHandle);
+        moveJobHandle.Complete();
+        
     }
 
     private void Detect()
@@ -176,7 +211,10 @@ public class FlockingOld : MonoBehaviour
 
     private void OnDestroy()
     {
-        _detectionCommands.Dispose();
+        //_detectionCommands.Dispose();
+
+        _entitiesVelocities.Dispose();
+        _entitiesAccelerations.Dispose();
         _entitiesPositions.Dispose();
         
         _transformAccessArray.Dispose();

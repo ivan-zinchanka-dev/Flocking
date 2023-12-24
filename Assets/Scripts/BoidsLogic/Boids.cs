@@ -78,10 +78,10 @@ namespace BoidsLogic
             
             JobHandle boundsJobHandle = boundsJob.Schedule(_entitiesNumber, 0);
             JobHandle accelerationJobHandle = accelerationJob.Schedule(_entitiesNumber, 0, boundsJobHandle);
-
-            JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesNumber, 0, accelerationJobHandle); 
             
-            JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, pointOfInterestJobHandle);
+            //JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesNumber, 0, accelerationJobHandle); 
+            
+            JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, accelerationJobHandle);
             moveJobHandle.Complete();
 
             foreach (Vector3 position in _entitiesPositions)
