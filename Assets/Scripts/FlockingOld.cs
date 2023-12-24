@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BoidsLogic;
 using Jobs;
 using Unity.Collections;
@@ -13,11 +14,7 @@ public class FlockingOld : MonoBehaviour
     [SerializeField] private int _sourceEntitiesCount = 50;
     [SerializeField] float _density = 0.15f;
     [SerializeField] private Bounds _entitiesMovingBounds;
-    [SerializeField] private Transform _pointOfInterest;
-    
-    //public float driveFactor = 10f;
-    public float maxSpeed = 5f;
-    
+    //[SerializeField] private Transform _pointOfInterest;
     
     private int _entitiesCount;
     
@@ -28,11 +25,29 @@ public class FlockingOld : MonoBehaviour
     private NativeArray<Vector3> _entitiesPositions;
     private NativeArray<Vector3> _entitiesVelocities;
     private NativeArray<Vector3> _entitiesAccelerations;
-    
-    private NativeArray<SpherecastCommand> _detectionCommands;
 
-    private Transform[] _entitiesTransforms; 
+    private Transform[] _entitiesTransforms;
+
+    private NativeArray<Vector3> _pointsOfInterest;
+
+    private InterestsManager _interestsManager;
     
+    public void Initialize(InterestsManager interestsManager)
+    {
+        _interestsManager = interestsManager;
+    }
+
+    private void UpdatePointsOfInterest()
+    {
+        if (_pointsOfInterest.IsCreated)
+        {
+            _pointsOfInterest.Dispose();
+        }
+        
+        _pointsOfInterest = new NativeArray<Vector3>(_interestsManager.PointsOfInterest.Select(point=>point.position)
+                .ToArray(), Allocator.Persistent);
+    }
+
     private void Start()
     {
         _entitiesCount = _sourceEntitiesCount;
@@ -110,38 +125,17 @@ public class FlockingOld : MonoBehaviour
 
     private void Update()
     {
-        
-        /*for (int i = 0; i < _entitiesPositions.Length; i++)
+        /*foreach (Vector3 position in _entitiesPositions)
         {
-            NativeArray<RaycastHit> results = new NativeArray<RaycastHit>(_entitiesCount, Allocator.Persistent);
-            NativeArray<SpherecastCommand> command = new NativeArray<SpherecastCommand>(1, Allocator.Persistent);
-            command[0] = _detectionCommands[i];
-            
-            JobHandle spherecastJobHandle = SpherecastCommand.ScheduleBatch(command, results, 1);       // only main thread
-            spherecastJobHandle.Complete();
-
-            foreach (var hit in results)
+            if (Vector3.Distance(position, _pointOfInterest.position) <= 1.0f)
             {
-                if (hit.collider != null)
-                {
-                    Debug.Log("hit");
-                }
+                _pointOfInterest.position = Random.insideUnitSphere * 15.0f;
+                break;
             }
-            
-            command.Dispose();
-            results.Dispose();
         }*/
 
-        //Detect();
+        UpdatePointsOfInterest();
 
-        /*DetectNearbyEntitiesJob detectNearbyJob = new DetectNearbyEntitiesJob(1.5f, _entitiesPositions);
-        //MotionJob motionJob = new MotionJob(_entitiesPositions);
-        
-        JobHandle detectNearbyJobHandle = detectNearbyJob.Schedule(_entitiesCount, 0);
-        //JobHandle motionJobHandle = motionJob.Schedule(_transformAccessArray, detectNearbyJobHandle);
-        
-        detectNearbyJobHandle.Complete();*/
-        
         MoveJob moveJob = new MoveJob(
             _entitiesPositions, 
             _entitiesVelocities, 
@@ -158,7 +152,8 @@ public class FlockingOld : MonoBehaviour
             _entitiesPositions, 
             _entitiesAccelerations, 
             new AccelerationWeights(1.0f, 1.0f, 1.0f, 0.1f),
-            _pointOfInterest.position);
+            Vector3.zero, 
+            _pointsOfInterest);
         
         BoundsJob boundsJob = new BoundsJob(
             _entitiesPositions, 
@@ -173,97 +168,23 @@ public class FlockingOld : MonoBehaviour
         
         JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, cohesionJobHandle);
 
-        //JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
-        moveJobHandle.Complete();
+        JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
+        pointOfInterestJobHandle.Complete();
         
-        /*foreach (Vector3 position in _entitiesPositions)
-        {
-            if (Vector3.Distance(position, _pointOfInterest.position) <= 1.0f)
-            {
-                _pointOfInterest.position = Random.insideUnitSphere * 30.0f;
-                break;
-            }
-        }*/
+        
     }
-
-    /*private void Detect()
-    {
-        
-        
-        for (int i = 0; i < _entitiesPositions.Length; i++)
-        {
-            Collider[] results = new Collider[_entitiesCount];
-            
-            int count = Physics.OverlapSphereNonAlloc(_entitiesPositions[i], 13.5f, results);
-
-            /*if (count > 0)
-            {
-                Debug.Log("detected");
-            }#1#
-
-            List<Vector3> arr = new List<Vector3>(count);
-
-            for (int j = 0; j < count; j++)
-            {
-                /*Gizmos.color = Color.red;
-                Gizmos.DrawLine(_entitiesPositions[i], results[j].transform.position);#1#
-
-                if (results[i] != null)
-                {
-                    arr.Add(results[i].transform.position);
-                }
-            }
-            
-            Vector3 motion = CalculateCohesionMotion(_entitiesPositions[i], arr);
-            
-            
-            motion *= driveFactor;
-            
-            if (motion.magnitude > maxSpeed)
-            {
-                motion = motion.normalized * maxSpeed;
-            }
-            
-            _transformAccessArray[i].up = motion;
-            _transformAccessArray[i].position += motion * Time.deltaTime;
-            
-            Debug.Log("motion: " + motion);
-            
-        }
-        
-    }*/
+    
 
     private void OnDrawGizmos()
     {
-        //Detect();
         Gizmos.DrawWireCube(_entitiesMovingBounds.center, _entitiesMovingBounds.size);
     }
-
-    private Vector3 CalculateCohesionMotion(Vector3 entityPosition, List<Vector3> neighbours)
-    {
-        if (neighbours.Count == 0)
-        {
-            return Vector3.zero;
-        }
-
-        Vector3 cohesionMotion = Vector3.zero;
-
-        foreach (Vector3 neighbourPosition in neighbours)
-        {
-            cohesionMotion += neighbourPosition;
-        }
-
-        cohesionMotion /= neighbours.Count;
-        cohesionMotion -= entityPosition;
-
-        return cohesionMotion;
-    }
-
-
+    
+    
     private void OnDestroy()
     {
-        //_detectionCommands.Dispose();
-
+        _pointsOfInterest.Dispose();
+        
         _entitiesVelocities.Dispose();
         _entitiesAccelerations.Dispose();
         _entitiesPositions.Dispose();

@@ -68,11 +68,11 @@ namespace BoidsLogic
                 Time.deltaTime, 
                 _entitiesVelocityLimit);
 
-            PointOfInterestJob pointOfInterestJob = new PointOfInterestJob(
+            /*PointOfInterestJob pointOfInterestJob = new PointOfInterestJob(
                 _entitiesPositions, 
                 _entitiesAccelerations,
                 _accelerationWeights, 
-                _pointOfInterest.position);
+                _pointOfInterest.position);*/
             
             
             
