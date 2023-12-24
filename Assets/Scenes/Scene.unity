@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 39560360}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.6, y: 6.4, z: 29.66}
+  m_LocalPosition: {x: 18.6, y: 6.4, z: 6.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -422,14 +422,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.097698465, y: -0, z: -0, w: 0.9952161}
-  m_LocalPosition: {x: 0, y: 6.46, z: -23.54}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 11.213, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1463706991
 GameObject:
   m_ObjectHideFlags: 0
@@ -475,10 +475,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _entityPrefab: {fileID: 6500178819360376908, guid: 8171d39bbdcf6d343aac267c12469329, type: 3}
-  _entitiesVelocityLimit: 3
+  _entitiesVelocityLimit: 10
   _sourceEntitiesCount: 100
+  _density: 0.15
+  _entitiesMovingBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 25, y: 17.5, z: 25}
   _pointOfInterest: {fileID: 39560361}
-  driveFactor: 10
   maxSpeed: 5
 --- !u!1 &1594266755
 GameObject:

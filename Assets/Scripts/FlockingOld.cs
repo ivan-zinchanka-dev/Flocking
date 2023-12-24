@@ -5,22 +5,20 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Jobs;
-using Quaternion = UnityEngine.Quaternion;
-using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 public class FlockingOld : MonoBehaviour
 {
     [SerializeField] private GameObject _entityPrefab;
     [SerializeField] private float _entitiesVelocityLimit;
     [SerializeField] private int _sourceEntitiesCount = 50;
-
+    [SerializeField] float _density = 0.15f;
+    [SerializeField] private Bounds _entitiesMovingBounds;
     [SerializeField] private Transform _pointOfInterest;
     
-    public float driveFactor = 10f;
+    //public float driveFactor = 10f;
     public float maxSpeed = 5f;
     
-    private const float Density = 0.08f;
+    
     private int _entitiesCount;
     
     private int _maxEntitiesCount = 1000;
@@ -43,7 +41,7 @@ public class FlockingOld : MonoBehaviour
         for (int i = 0; i < _entitiesCount; i++)
         {
             GameObject entity = Instantiate(_entityPrefab, 
-                Random.insideUnitSphere * _sourceEntitiesCount * Density,
+                Random.insideUnitSphere * _sourceEntitiesCount * _density,
                 Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
                 transform);
 
@@ -83,7 +81,7 @@ public class FlockingOld : MonoBehaviour
         for (int i = _entitiesCount; i < newEntitiesCount; i++)
         {
             GameObject entity = Instantiate(_entityPrefab, 
-                Random.insideUnitSphere * entitiesCountAppend * Density,
+                Random.insideUnitSphere * entitiesCountAppend * _density,
                 Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
                 transform);
 
@@ -162,14 +160,21 @@ public class FlockingOld : MonoBehaviour
             new AccelerationWeights(1.0f, 1.0f, 1.0f, 0.1f),
             _pointOfInterest.position);
         
+        BoundsJob boundsJob = new BoundsJob(
+            _entitiesPositions, 
+            _entitiesAccelerations, 
+            _entitiesMovingBounds.size);
+        
         Debug.Log("count: " + _entitiesCount);
 
-        JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 4); 
+        JobHandle boundsJobHandler = boundsJob.Schedule(_entitiesCount, 4);
+        
+        JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 4, boundsJobHandler); 
         
         JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, cohesionJobHandle);
 
-        JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
-        pointOfInterestJobHandle.Complete();
+        //JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
+        moveJobHandle.Complete();
         
         /*foreach (Vector3 position in _entitiesPositions)
         {
@@ -181,7 +186,7 @@ public class FlockingOld : MonoBehaviour
         }*/
     }
 
-    private void Detect()
+    /*private void Detect()
     {
         
         
@@ -194,14 +199,14 @@ public class FlockingOld : MonoBehaviour
             /*if (count > 0)
             {
                 Debug.Log("detected");
-            }*/
+            }#1#
 
             List<Vector3> arr = new List<Vector3>(count);
 
             for (int j = 0; j < count; j++)
             {
                 /*Gizmos.color = Color.red;
-                Gizmos.DrawLine(_entitiesPositions[i], results[j].transform.position);*/
+                Gizmos.DrawLine(_entitiesPositions[i], results[j].transform.position);#1#
 
                 if (results[i] != null)
                 {
@@ -226,11 +231,12 @@ public class FlockingOld : MonoBehaviour
             
         }
         
-    }
+    }*/
 
     private void OnDrawGizmos()
     {
         //Detect();
+        Gizmos.DrawWireCube(_entitiesMovingBounds.center, _entitiesMovingBounds.size);
     }
 
     private Vector3 CalculateCohesionMotion(Vector3 entityPosition, List<Vector3> neighbours)
