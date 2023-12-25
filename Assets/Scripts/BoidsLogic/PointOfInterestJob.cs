@@ -12,7 +12,7 @@ namespace BoidsLogic
         private AccelerationWeights _weights;
         private Vector3 _interestPosition;
 
-        private const float ConsumeRadius = 0.5f;
+        private const float ConsumeRadius = 1.0f;
 
         [NativeDisableParallelForRestriction] private NativeArray<PointOfInterest> _pointsOfInterest;
 

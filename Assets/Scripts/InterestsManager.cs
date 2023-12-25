@@ -14,22 +14,29 @@ public class InterestsManager : MonoBehaviour
     [SerializeField] private FlockingOld _flocking;
 
     private readonly Dictionary<Guid, Transform> _pointsOfInterest = new Dictionary<Guid, Transform> ();
-
+    
     private void Awake()
     {
         for (int i = 0; i < 3; i++)
         {
-            Transform pointOfInterest = Instantiate(_pointOfInterestPrefab, 
-                Random.insideUnitSphere * _spawnBounds.extents.y * 0.85f, 
-                Quaternion.identity, transform);
-
-            Guid pointId = Guid.NewGuid();
-            _pointsOfInterest[pointId] = pointOfInterest;
+            SpawnPointOfInterest();
         }
 
         _flocking.Initialize(this);
     }
 
+    [EasyButtons.Button]
+    private void SpawnPointOfInterest()
+    {
+        Transform pointOfInterest = Instantiate(_pointOfInterestPrefab, 
+            Random.insideUnitSphere * _spawnBounds.extents.y * 0.85f, 
+            Quaternion.identity, transform);
+
+        Guid pointId = Guid.NewGuid();
+        _pointsOfInterest[pointId] = pointOfInterest;
+        
+    }
+    
     public NativeArray<PointOfInterest> GetPointsOfInterest()
     {
         return new NativeArray<PointOfInterest>(_pointsOfInterest

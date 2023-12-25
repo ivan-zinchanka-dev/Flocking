@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BoidsLogic;
 using Jobs;
@@ -7,6 +8,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Jobs;
+using Random = UnityEngine.Random;
 
 public class FlockingOld : MonoBehaviour
 {
@@ -30,6 +32,8 @@ public class FlockingOld : MonoBehaviour
     private Transform[] _entitiesTransforms;
 
     private NativeArray<PointOfInterest> _pointsOfInterest;
+    private NativeArray<bool> _reproductionResults;
+
 
     private InterestsManager _interestsManager;
     
@@ -83,6 +87,9 @@ public class FlockingOld : MonoBehaviour
         }
         
         _entitiesAccelerations = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
+
+        _reproductionResults = new NativeArray<bool>(_maxEntitiesCount, Allocator.Persistent);
+        _pointsOfInterest = _interestsManager.GetPointsOfInterest();
     }
 
     [EasyButtons.Button]
@@ -175,7 +182,24 @@ public class FlockingOld : MonoBehaviour
         
         
     }
-    
+
+    private void FixedUpdate()
+    {
+        for (int i = 0; i < _reproductionResults.Length; i++)
+        {
+            _reproductionResults[i] = false;
+        }
+
+        ReproductionJob reproductionJob = new ReproductionJob(
+            _entitiesCount,
+            _entitiesPositions,
+            _pointsOfInterest,
+            _reproductionResults);
+
+        JobHandle reproductionJobHandle = reproductionJob.Schedule(_entitiesCount, 4);
+        reproductionJobHandle.Complete();
+    }
+
 
     private void OnDrawGizmos()
     {
@@ -185,6 +209,7 @@ public class FlockingOld : MonoBehaviour
     
     private void OnDestroy()
     {
+        _reproductionResults.Dispose();
         _pointsOfInterest.Dispose();
         
         _entitiesVelocities.Dispose();
