@@ -63,6 +63,7 @@ namespace Jobs
                     _reproductionResults[i] = true;
                     
                     Debug.Log("Reproducted");
+                    break;
                 }
             }
             

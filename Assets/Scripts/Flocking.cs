@@ -54,7 +54,6 @@ public class Flocking : MonoBehaviour
         }
         
         _pointsOfInterest = _interestsManager.GetPointsOfInterest();
-        Debug.Log("Gotten array lenght: " + _pointsOfInterest.Length);
     }
 
     private void Start()
@@ -65,7 +64,7 @@ public class Flocking : MonoBehaviour
         for (int i = 0; i < _entitiesCount; i++)
         {
             GameObject entity = Instantiate(_entityPrefab, 
-                Random.insideUnitSphere * _sourceEntitiesCount * _density,
+                Random.insideUnitSphere * (_entitiesCount * _density),
                 Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
                 transform);
 
@@ -100,17 +99,17 @@ public class Flocking : MonoBehaviour
     [EasyButtons.Button]
     private void Add3()
     {
-        Reproduction(3);
+        MakeReproduction(3);
     }
     
-    private void Reproduction(int entitiesCountAppend)
+    private void MakeReproduction(int entitiesCountAppend)
     {
         int newEntitiesCount = Mathf.Clamp(_entitiesCount + entitiesCountAppend, 0, _maxEntitiesCount);
         
         for (int i = _entitiesCount; i < newEntitiesCount; i++)
         {
             GameObject entity = Instantiate(_entityPrefab, 
-                Random.insideUnitSphere * entitiesCountAppend * _density,
+                Random.insideUnitSphere * (_entitiesCount * _density),
                 Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
                 transform);
 
@@ -141,15 +140,6 @@ public class Flocking : MonoBehaviour
 
     private void Update()
     {
-        /*foreach (Vector3 position in _entitiesPositions)
-        {
-            if (Vector3.Distance(position, _pointOfInterest.position) <= 1.0f)
-            {
-                _pointOfInterest.position = Random.insideUnitSphere * 15.0f;
-                break;
-            }
-        }*/
-
         UpdatePointsOfInterest();
 
         MoveJob moveJob = new MoveJob(
@@ -175,8 +165,6 @@ public class Flocking : MonoBehaviour
             _entitiesPositions, 
             _entitiesAccelerations, 
             _entitiesMovingBounds.size);
-        
-        Debug.Log("count: " + _entitiesCount);
 
         JobHandle boundsJobHandler = boundsJob.Schedule(_entitiesCount, 4);
         
@@ -192,10 +180,30 @@ public class Flocking : MonoBehaviour
 
     private void FixedUpdate()
     {
+        TryMakeReproduction();
+    }
+    
+    private void TryMakeReproduction()
+    {
+        if (_entitiesCount >= _maxEntitiesCount)
+        {
+            return;
+        }
+
+        int entitiesCountAppend = 0;
+        
         for (int i = 0; i < _reproductionResults.Length; i++)
         {
+            if (_reproductionResults[i])
+            {
+                entitiesCountAppend++;
+            }
+
             _reproductionResults[i] = false;
         }
+
+        entitiesCountAppend /= 2;
+        MakeReproduction(entitiesCountAppend);
 
         ReproductionJob reproductionJob = new ReproductionJob(
             _entitiesCount,
@@ -205,6 +213,7 @@ public class Flocking : MonoBehaviour
 
         JobHandle reproductionJobHandle = reproductionJob.Schedule(_entitiesCount, 4);
         reproductionJobHandle.Complete();
+        
     }
 
 
