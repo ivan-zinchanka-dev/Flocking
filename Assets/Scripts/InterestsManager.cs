@@ -20,10 +20,10 @@ public class InterestsManager : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             Transform pointOfInterest = Instantiate(_pointOfInterestPrefab, 
-                Random.insideUnitSphere * _spawnBounds.extents.y, 
+                Random.insideUnitSphere * _spawnBounds.extents.y * 0.85f, 
                 Quaternion.identity, transform);
 
-            Guid pointId = new Guid();
+            Guid pointId = Guid.NewGuid();
             _pointsOfInterest[pointId] = pointOfInterest;
         }
 
@@ -32,14 +32,9 @@ public class InterestsManager : MonoBehaviour
 
     public NativeArray<PointOfInterest> GetPointsOfInterest()
     {
-        PointOfInterest[] array = _pointsOfInterest
+        return new NativeArray<PointOfInterest>(_pointsOfInterest
             .Select(point => new PointOfInterest(point.Key, point.Value.position))
-            .ToArray();
-        
-        Debug.Log("Len: " + array.Length);
-        // TODO always 1 
-        
-        return new NativeArray<PointOfInterest>(array, Allocator.Persistent);
+            .ToArray(), Allocator.Persistent);
     }
 
     public void UpdatePointsOfInterest(NativeArray<PointOfInterest> pointOfInterests)
@@ -48,8 +43,6 @@ public class InterestsManager : MonoBehaviour
         {
             if (pointOfInterests[i].IsConsumed)
             {
-                Debug.Log("Try destroy");
-                
                 Guid pointId = pointOfInterests[i].Id;
             
                 if (_pointsOfInterest.TryGetValue(pointId, out Transform point))
