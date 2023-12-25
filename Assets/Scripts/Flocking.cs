@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using BoidsLogic;
+using Cysharp.Threading.Tasks;
 using Jobs;
 using Models;
 using Unity.Collections;
@@ -17,7 +19,7 @@ public class Flocking : MonoBehaviour
     [SerializeField] private int _sourceEntitiesCount = 50;
     [SerializeField] float _density = 0.15f;
     [SerializeField] private Bounds _entitiesMovingBounds;
-    //[SerializeField] private Transform _pointOfInterest;
+    [field: SerializeField, Range(0.25f, 4.0f)] public float ReproductionRate { get; set; } = 1.0f;
     
     private int _entitiesCount;
     
@@ -37,7 +39,11 @@ public class Flocking : MonoBehaviour
 
     private InterestsManager _interestsManager;
 
+    private CancellationTokenSource _reproductionCts = new CancellationTokenSource();
+
     public int EntitiesCount => _entitiesCount;
+    
+
     public event Action<int> OnEntitiesCountChanged; 
 
     public void Initialize(InterestsManager interestsManager)
@@ -94,6 +100,23 @@ public class Flocking : MonoBehaviour
         _pointsOfInterest = _interestsManager.GetPointsOfInterest();
         
         OnEntitiesCountChanged?.Invoke(_entitiesCount);
+        
+        LaunchReproduction().Forget();
+    }
+
+    private async UniTaskVoid LaunchReproduction()
+    {
+        while (!_reproductionCts.IsCancellationRequested)
+        {
+            //4 sec = 1 / 0.25
+            if (ReproductionRate == 0)
+            {
+                continue;
+            }
+
+            await UniTask.Delay(TimeSpan.FromSeconds(1.0f / ReproductionRate));
+            TryMakeReproduction();
+        }
     }
 
     [EasyButtons.Button]
@@ -174,15 +197,8 @@ public class Flocking : MonoBehaviour
 
         JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
         pointOfInterestJobHandle.Complete();
-        
-        
     }
 
-    private void FixedUpdate()
-    {
-        TryMakeReproduction();
-    }
-    
     private void TryMakeReproduction()
     {
         if (_entitiesCount >= _maxEntitiesCount)
@@ -225,6 +241,9 @@ public class Flocking : MonoBehaviour
     
     private void OnDestroy()
     {
+        _reproductionCts.Cancel();
+        _reproductionCts.Dispose();
+        
         _reproductionResults.Dispose();
         _pointsOfInterest.Dispose();
         
