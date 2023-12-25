@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Jobs;
 using Random = UnityEngine.Random;
 
-public class FlockingOld : MonoBehaviour
+public class Flocking : MonoBehaviour
 {
     [SerializeField] private GameObject _entityPrefab;
     [SerializeField] private float _entitiesVelocityLimit;

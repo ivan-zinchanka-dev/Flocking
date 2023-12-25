@@ -11,7 +11,7 @@ namespace UI
         
         [Space]
         [SerializeField] private InterestsManager _interestsManager;
-        [SerializeField] private FlockingOld _flocking;
+        [SerializeField] private Flocking _flocking;
 
         private void Awake()
         {
