@@ -26,7 +26,7 @@ public class InterestsManager : MonoBehaviour
     }
 
     [EasyButtons.Button]
-    private void SpawnPointOfInterest()
+    public void SpawnPointOfInterest()
     {
         Transform pointOfInterest = Instantiate(_pointOfInterestPrefab, 
             Random.insideUnitSphere * _spawnBounds.extents.y * 0.85f, 

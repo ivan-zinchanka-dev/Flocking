@@ -36,7 +36,10 @@ public class FlockingOld : MonoBehaviour
 
 
     private InterestsManager _interestsManager;
-    
+
+    public int EntitiesCount => _entitiesCount;
+    public event Action<int> OnEntitiesCountChanged; 
+
     public void Initialize(InterestsManager interestsManager)
     {
         _interestsManager = interestsManager;
@@ -90,6 +93,8 @@ public class FlockingOld : MonoBehaviour
 
         _reproductionResults = new NativeArray<bool>(_maxEntitiesCount, Allocator.Persistent);
         _pointsOfInterest = _interestsManager.GetPointsOfInterest();
+        
+        OnEntitiesCountChanged?.Invoke(_entitiesCount);
     }
 
     [EasyButtons.Button]
@@ -129,6 +134,8 @@ public class FlockingOld : MonoBehaviour
         }
 
         _entitiesCount = newEntitiesCount;
+        
+        OnEntitiesCountChanged?.Invoke(_entitiesCount);
     }
 
 
