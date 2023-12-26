@@ -25,11 +25,20 @@ public class InterestsManager : MonoBehaviour
         _flocking.Initialize(this);
     }
 
+    private Vector3 GetPositionInsideBounds()
+    {
+        Vector3 boundsOffset = Vector3.one * 3.5f;
+        Vector3 min = _spawnBounds.min + boundsOffset;
+        Vector3 max = _spawnBounds.max - boundsOffset;
+
+        return new Vector3(Random.Range(min.x, max.x), Random.Range(min.y, max.y), Random.Range(min.z, max.z));
+    }
+
     [EasyButtons.Button]
     public void SpawnPointOfInterest()
     {
         Transform pointOfInterest = Instantiate(_pointOfInterestPrefab, 
-            Random.insideUnitSphere * _spawnBounds.extents.y * 0.85f, 
+            GetPositionInsideBounds(), 
             Quaternion.identity, transform);
 
         Guid pointId = Guid.NewGuid();

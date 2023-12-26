@@ -30,11 +30,11 @@ namespace BoidsLogic
             Vector3 direction = velocity.normalized;
             velocity = direction * Mathf.Clamp(velocity.magnitude, 1f, _velocityLimit);
             
-            /*Debug.Log("Velocity: " + velocity.magnitude);*/
+            Debug.Log("Velocity: " + velocity.magnitude);
             
             transform.position += velocity * _deltaTime;
             transform.rotation = Quaternion.LookRotation(direction);
-
+            
             _positions[index] = transform.position;
             _velocities[index] = velocity;
             _accelerations[index] = Vector3.zero;

@@ -91,7 +91,7 @@ public class Flocking : MonoBehaviour
         
         for (int i = 0; i < _entitiesCount; i++)
         {
-            _entitiesVelocities[i] = Random.insideUnitSphere;
+            _entitiesVelocities[i] = Random.insideUnitSphere * _entitiesVelocityLimit / 2;
         }
         
         _entitiesAccelerations = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
