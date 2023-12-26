@@ -632,7 +632,7 @@ RectTransform:
   - {fileID: 291835739}
   - {fileID: 1913717249}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -936,7 +936,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &645340738
 GameObject:
@@ -1826,71 +1826,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _entityPrefab: {fileID: 6500178819360376908, guid: 8171d39bbdcf6d343aac267c12469329, type: 3}
-  _entitiesVelocityLimit: 10
   _sourceEntitiesCount: 100
   _density: 0.15
   _entitiesMovingBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 25, y: 17.5, z: 25}
-  <ReproductionRate>k__BackingField: 1
   <EntityVelocityLimit>k__BackingField: 10
---- !u!1 &1594266755
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1594266757}
-  - component: {fileID: 1594266756}
-  m_Layer: 0
-  m_Name: Boids
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1594266756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1594266755}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 951cd28e5cb4497eb5d6e31419e369ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _entityPrefab: {fileID: 6500178819360376908, guid: 8171d39bbdcf6d343aac267c12469329, type: 3}
-  _entitiesNumber: 700
-  _entitiesDestinationThreshold: 1
-  _entitiesVelocityLimit: 3
-  _accelerationWeights:
-    AverageSpread: 5
-    AverageVelocity: 0.2
-    AveragePosition: 0.2
-    PointOfInterest: 0.1
-  _pointOfInterest: {fileID: 0}
-  _entitiesMovingBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 50, y: 35, z: 50}
---- !u!4 &1594266757
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1594266755}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  <ReproductionRate>k__BackingField: 1
 --- !u!1 &1759337207
 GameObject:
   m_ObjectHideFlags: 0

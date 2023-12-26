@@ -3,7 +3,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace BoidsLogic
+namespace Jobs
 {
     [BurstCompile]
     public struct BoundsJob : IJobParallelFor

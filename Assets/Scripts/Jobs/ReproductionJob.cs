@@ -61,8 +61,6 @@ namespace Jobs
                 {
                     _reproductionResults[index] = true;
                     _reproductionResults[i] = true;
-                    
-                    Debug.Log("Reproducted");
                     break;
                 }
             }

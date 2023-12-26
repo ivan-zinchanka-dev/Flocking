@@ -10,7 +10,6 @@ public class InterestsManager : MonoBehaviour
 {
     [SerializeField] private Transform _pointOfInterestPrefab;
     [SerializeField] private Bounds _spawnBounds;
-
     [SerializeField] private Flocking _flocking;
 
     private readonly Dictionary<Guid, Transform> _pointsOfInterest = new Dictionary<Guid, Transform> ();
@@ -69,6 +68,4 @@ public class InterestsManager : MonoBehaviour
             }
         }
     }
-
-
 }
