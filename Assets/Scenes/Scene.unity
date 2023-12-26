@@ -268,7 +268,7 @@ MonoBehaviour:
   _pointOfInterestPrefab: {fileID: 6613330158632234162, guid: 1147facf5b2517749baee544378640c6, type: 3}
   _spawnBounds:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 25, y: 17.5, z: 25}
+    m_Extent: {x: 21.5, y: 14, z: 21.5}
   _flocking: {fileID: 1463706993}
 --- !u!4 &76406901
 Transform:
