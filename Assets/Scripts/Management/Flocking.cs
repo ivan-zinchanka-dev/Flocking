@@ -32,7 +32,7 @@ namespace Management
         private NativeArray<Vector3> _entitiesPositions;
         private NativeArray<Vector3> _entitiesVelocities;
         private NativeArray<Vector3> _entitiesAccelerations;
-        private NativeArray<bool> _reproductionResults;
+        private NativeArray<byte> _reproductionResults;
     
         private readonly CancellationTokenSource _reproductionCts = new CancellationTokenSource();
         private InterestsManager _interestsManager;
@@ -69,6 +69,9 @@ namespace Management
 
         private void Start()
         {
+            Debug.Log("True Byte: " + Convert.ToByte(true));
+            Debug.Log("False Byte: " + Convert.ToByte(false));
+            
             _entitiesCount = _sourceEntitiesCount;
             _entitiesTransforms = new Transform[MaxEntitiesCount];
 
@@ -97,7 +100,7 @@ namespace Management
         
             _entitiesAccelerations = new NativeArray<Vector3>(MaxEntitiesCount, Allocator.Persistent);
 
-            _reproductionResults = new NativeArray<bool>(MaxEntitiesCount, Allocator.Persistent);
+            _reproductionResults = new NativeArray<byte>(MaxEntitiesCount, Allocator.Persistent);
             _pointsOfInterest = _interestsManager.GetPointsOfInterest();
         
             OnEntitiesCountChanged?.Invoke(_entitiesCount);
@@ -129,12 +132,12 @@ namespace Management
         
             for (int i = 0; i < _reproductionResults.Length; i++)
             {
-                if (_reproductionResults[i])
+                if (Convert.ToBoolean(_reproductionResults[i]))
                 {
                     entitiesCountAppend++;
                 }
 
-                _reproductionResults[i] = false;
+                _reproductionResults[i] = Convert.ToByte(false);
             }
 
             entitiesCountAppend /= 2;

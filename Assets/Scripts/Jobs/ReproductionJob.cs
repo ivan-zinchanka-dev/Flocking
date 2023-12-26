@@ -12,13 +12,13 @@ namespace Jobs
         private readonly float _entitiesCount;
         [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<Vector3> _positions;
         [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<PointOfInterest> _pointsOfInterest;
-        [NativeDisableParallelForRestriction] private NativeArray<bool> _reproductionResults;
+        [NativeDisableParallelForRestriction] private NativeArray<byte> _reproductionResults;
         
         private readonly float _reproductionZoneRadius;
         private readonly float _reproductionContactRadius;
 
         public ReproductionJob(float entitiesCount, NativeArray<Vector3> positions, 
-            NativeArray<PointOfInterest> pointsOfInterest, NativeArray<bool> reproductionResults, 
+            NativeArray<PointOfInterest> pointsOfInterest, NativeArray<byte> reproductionResults, 
             float reproductionZoneRadius, float reproductionContactRadius)
         {
             _entitiesCount = entitiesCount;
@@ -31,7 +31,7 @@ namespace Jobs
 
         public void Execute(int index)
         {
-            if (_reproductionResults[index])
+            if (_reproductionResults[index] == 1)
             {
                 return;
             }
@@ -64,8 +64,7 @@ namespace Jobs
                 
                 if (Vector3.Distance(selfPosition, otherPosition) < _reproductionContactRadius)
                 {
-                    _reproductionResults[index] = true;
-                    _reproductionResults[i] = true;
+                    _reproductionResults[index] = _reproductionResults[i] = 1;
                     break;
                 }
             }

@@ -7,9 +7,9 @@ namespace Models
     {
         public Guid Id;
         public Vector3 Position;
-        public bool IsConsumed;
+        public byte IsConsumed;
 
-        public PointOfInterest(Guid id, Vector3 position, bool isConsumed = false)
+        public PointOfInterest(Guid id, Vector3 position, byte isConsumed = 0)
         {
             Id = id;
             Position = position;
@@ -18,7 +18,7 @@ namespace Models
 
         public void Consume()
         {
-            IsConsumed = true;
+            IsConsumed = 1;
         }
     }
 }

@@ -56,7 +56,7 @@ namespace Management
         {
             for (int i = 0; i < pointOfInterests.Length; i++)
             {
-                if (pointOfInterests[i].IsConsumed)
+                if (Convert.ToBoolean(pointOfInterests[i].IsConsumed))
                 {
                     Guid pointId = pointOfInterests[i].Id;
             

@@ -50,7 +50,7 @@ namespace Jobs
             if (Vector3.Distance(_positions[index], _pointsOfInterest[chosenPointIndex].Position) < _consumeRadius)
             {
                 PointOfInterest cachedPoint = _pointsOfInterest[chosenPointIndex];
-                _pointsOfInterest[chosenPointIndex] = new PointOfInterest(cachedPoint.Id, cachedPoint.Position, true);
+                _pointsOfInterest[chosenPointIndex] = new PointOfInterest(cachedPoint.Id, cachedPoint.Position, 1);
             }
 
             Vector3 acceleration = _pointsOfInterest[chosenPointIndex].Position - _positions[index];
