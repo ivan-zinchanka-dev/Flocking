@@ -1831,7 +1831,7 @@ MonoBehaviour:
   _entitiesMovingBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 25, y: 17.5, z: 25}
-  <EntityVelocityLimit>k__BackingField: 10
+  <EntityVelocityLimit>k__BackingField: 8
   <ReproductionRate>k__BackingField: 1
 --- !u!1 &1759337207
 GameObject:

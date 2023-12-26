@@ -36,7 +36,8 @@ namespace Management
     
         private readonly CancellationTokenSource _reproductionCts = new CancellationTokenSource();
         private InterestsManager _interestsManager;
-    
+        private float _cachedMinExtent = -1.0f;
+        
         public void Initialize(InterestsManager interestsManager)
         {
             _interestsManager = interestsManager;
@@ -53,6 +54,25 @@ namespace Management
             _pointsOfInterest = _interestsManager.GetPointsOfInterest();
         }
 
+        private GameObject CreateEntity()
+        {
+            if (_cachedMinExtent < 0.0f)
+            {
+                Vector3 boundsExtents = _entitiesMovingBounds.extents;
+                _cachedMinExtent = Mathf.Min(boundsExtents.x, boundsExtents.y, boundsExtents.z);
+            }
+            
+            return Instantiate(_entityPrefab, 
+                Random.insideUnitSphere * Mathf.Clamp(_entitiesCount * _density, 0.0f, _cachedMinExtent),
+                Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
+                transform);
+        }
+
+        private Vector3 GetStartVelocity()
+        {
+            return Random.insideUnitSphere * Mathf.Sqrt(EntityVelocityLimit);
+        }
+
         private void Start()
         {
             _entitiesCount = _sourceEntitiesCount;
@@ -60,11 +80,7 @@ namespace Management
 
             for (int i = 0; i < _entitiesCount; i++)
             {
-                GameObject entity = Instantiate(_entityPrefab, 
-                    Random.insideUnitSphere * (_entitiesCount * _density),
-                    Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
-                    transform);
-
+                GameObject entity = CreateEntity();
                 entity.name = "entity_" + i;
                 _entitiesTransforms[i] = entity.transform;
             }
@@ -82,7 +98,7 @@ namespace Management
         
             for (int i = 0; i < _entitiesCount; i++)
             {
-                _entitiesVelocities[i] = Random.insideUnitSphere * EntityVelocityLimit / 2;
+                _entitiesVelocities[i] = GetStartVelocity();
             }
         
             _entitiesAccelerations = new NativeArray<Vector3>(MaxEntitiesCount, Allocator.Persistent);
@@ -93,7 +109,7 @@ namespace Management
             OnEntitiesCountChanged?.Invoke(_entitiesCount);
             LaunchReproduction().Forget();
         }
-
+        
         private async UniTaskVoid LaunchReproduction()
         {
             while (!_reproductionCts.IsCancellationRequested)
@@ -107,13 +123,7 @@ namespace Management
                 TryMakeReproduction();
             }
         }
-
-        [EasyButtons.Button]
-        private void Spawn3Entity()
-        {
-            MakeReproduction(3);
-        }
-    
+        
         private void TryMakeReproduction()
         {
             if (_entitiesCount >= MaxEntitiesCount)
@@ -154,11 +164,7 @@ namespace Management
         
             for (int i = _entitiesCount; i < newEntitiesCount; i++)
             {
-                GameObject entity = Instantiate(_entityPrefab, 
-                    Random.insideUnitSphere * (_entitiesCount * _density),
-                    Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
-                    transform);
-
+                GameObject entity = CreateEntity();
                 entity.name = $"entity_{i}_generated";
                 _entitiesTransforms[i] = entity.transform;
             }
@@ -175,7 +181,7 @@ namespace Management
         
             for (int i = _entitiesCount; i < newEntitiesCount; i++)
             {
-                _entitiesVelocities[i] = Random.insideUnitSphere;
+                _entitiesVelocities[i] = GetStartVelocity();
             }
 
             _entitiesCount = newEntitiesCount;
@@ -192,11 +198,11 @@ namespace Management
                 _entitiesMovingBounds.size);
             
             CohesionJob cohesionJob = new CohesionJob(
+                _entitiesCount,
                 5.0f, 
                 2.0f, 
                 _entitiesPositions, 
-                _entitiesAccelerations, 
-                _entitiesCount);
+                _entitiesAccelerations);
             
             MoveJob moveJob = new MoveJob(
                 _entitiesPositions, 

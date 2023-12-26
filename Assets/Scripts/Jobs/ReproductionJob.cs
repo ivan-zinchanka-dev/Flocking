@@ -1,10 +1,12 @@
 ﻿using Models;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
 namespace Jobs
 {
+    [BurstCompile]
     public struct ReproductionJob : IJobParallelFor
     {
         private readonly float _entitiesCount;

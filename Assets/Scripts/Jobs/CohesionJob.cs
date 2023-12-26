@@ -8,21 +8,21 @@ namespace Jobs
     [BurstCompile]
     public struct CohesionJob : IJobParallelFor
     {
+        private readonly float _entitiesCount;
         private readonly float _coverageRadius;
         private readonly float _thresholdRadius;
         
         [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<Vector3> _positions;
         private NativeArray<Vector3> _accelerations;
-        private readonly float _entitiesCount;
-
-        public CohesionJob(float coverageRadius, float thresholdRadius, NativeArray<Vector3> positions, 
-            NativeArray<Vector3> accelerations, float entitiesCount)
+        
+        public CohesionJob(float entitiesCount, float coverageRadius, float thresholdRadius, NativeArray<Vector3> positions, 
+            NativeArray<Vector3> accelerations)
         {
+            _entitiesCount = entitiesCount;
             _coverageRadius = coverageRadius;
             _thresholdRadius = thresholdRadius;
             _positions = positions;
             _accelerations = accelerations;
-            _entitiesCount = entitiesCount;
         }
 
         public void Execute(int index)
