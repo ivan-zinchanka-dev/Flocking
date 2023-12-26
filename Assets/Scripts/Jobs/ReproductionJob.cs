@@ -7,21 +7,24 @@ namespace Jobs
 {
     public struct ReproductionJob : IJobParallelFor
     {
-        private float _positionsCount;
-        [NativeDisableParallelForRestriction] private NativeArray<Vector3> _positions;
-        [NativeDisableParallelForRestriction] private NativeArray<PointOfInterest> _pointsOfInterest;
+        private readonly float _entitiesCount;
+        [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<Vector3> _positions;
+        [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<PointOfInterest> _pointsOfInterest;
         [NativeDisableParallelForRestriction] private NativeArray<bool> _reproductionResults;
         
-        private const float ReproductionZoneRadius = 5.0f;
-        private const float ReproductionContactRadius = 1.0f;
+        private readonly float _reproductionZoneRadius;
+        private readonly float _reproductionContactRadius;
 
-        public ReproductionJob(float positionsCount, NativeArray<Vector3> positions,
-            NativeArray<PointOfInterest> pointsOfInterest, NativeArray<bool> reproductionResults)
+        public ReproductionJob(float entitiesCount, NativeArray<Vector3> positions, 
+            NativeArray<PointOfInterest> pointsOfInterest, NativeArray<bool> reproductionResults, 
+            float reproductionZoneRadius, float reproductionContactRadius)
         {
-            _positionsCount = positionsCount;
+            _entitiesCount = entitiesCount;
             _positions = positions;
             _pointsOfInterest = pointsOfInterest;
             _reproductionResults = reproductionResults;
+            _reproductionZoneRadius = reproductionZoneRadius;
+            _reproductionContactRadius = reproductionContactRadius;
         }
 
         public void Execute(int index)
@@ -36,7 +39,7 @@ namespace Jobs
             
             for (int i = 0; i < _pointsOfInterest.Length; i++)
             {
-                if (Vector3.Distance(selfPosition, _pointsOfInterest[i].Position) < ReproductionZoneRadius)
+                if (Vector3.Distance(selfPosition, _pointsOfInterest[i].Position) < _reproductionZoneRadius)
                 {
                     insideReproductionZone = true;
                     break;
@@ -48,7 +51,7 @@ namespace Jobs
                 return;
             }
 
-            for (int i = 0; i < _positionsCount; i++)
+            for (int i = 0; i < _entitiesCount; i++)
             {
                 if (i == index)
                 {
@@ -57,7 +60,7 @@ namespace Jobs
                 
                 Vector3 otherPosition = _positions[i];
                 
-                if (Vector3.Distance(selfPosition, otherPosition) < ReproductionContactRadius)
+                if (Vector3.Distance(selfPosition, otherPosition) < _reproductionContactRadius)
                 {
                     _reproductionResults[index] = true;
                     _reproductionResults[i] = true;

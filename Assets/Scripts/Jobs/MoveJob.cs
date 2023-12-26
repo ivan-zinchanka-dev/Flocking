@@ -11,8 +11,8 @@ namespace Jobs
         private NativeArray<Vector3> _positions;
         private NativeArray<Vector3> _velocities;
         private NativeArray<Vector3> _accelerations;
-        private float _deltaTime;
-        private float _velocityLimit;
+        private readonly float _deltaTime;
+        private readonly float _velocityLimit;
 
         public MoveJob(NativeArray<Vector3> positions, NativeArray<Vector3> velocities, NativeArray<Vector3> accelerations,
             float deltaTime, float velocityLimit)
@@ -29,8 +29,6 @@ namespace Jobs
             Vector3 velocity = _velocities[index] + _accelerations[index] * _deltaTime;
             Vector3 direction = velocity.normalized;
             velocity = direction * Mathf.Clamp(velocity.magnitude, 1f, _velocityLimit);
-            
-            Debug.Log("Velocity: " + velocity.magnitude);
             
             transform.position += velocity * _deltaTime;
             transform.rotation = Quaternion.LookRotation(direction);

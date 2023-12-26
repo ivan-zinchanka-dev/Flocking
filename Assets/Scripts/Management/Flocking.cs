@@ -91,7 +91,6 @@ namespace Management
             _pointsOfInterest = _interestsManager.GetPointsOfInterest();
         
             OnEntitiesCountChanged?.Invoke(_entitiesCount);
-        
             LaunchReproduction().Forget();
         }
 
@@ -141,7 +140,9 @@ namespace Management
                 _entitiesCount,
                 _entitiesPositions,
                 _pointsOfInterest,
-                _reproductionResults);
+                _reproductionResults,
+                5.0f,
+                1.0f);
 
             JobHandle reproductionJobHandle = reproductionJob.Schedule(_entitiesCount, 4);
             reproductionJobHandle.Complete();
@@ -178,7 +179,6 @@ namespace Management
             }
 
             _entitiesCount = newEntitiesCount;
-        
             OnEntitiesCountChanged?.Invoke(_entitiesCount);
         }
     
@@ -186,34 +186,35 @@ namespace Management
         {
             UpdatePointsOfInterest();
 
+            BoundsJob boundsJob = new BoundsJob(
+                _entitiesPositions, 
+                _entitiesAccelerations, 
+                _entitiesMovingBounds.size);
+            
+            CohesionJob cohesionJob = new CohesionJob(
+                5.0f, 
+                2.0f, 
+                _entitiesPositions, 
+                _entitiesAccelerations, 
+                _entitiesCount);
+            
             MoveJob moveJob = new MoveJob(
                 _entitiesPositions, 
                 _entitiesVelocities, 
                 _entitiesAccelerations, 
                 Time.deltaTime, 
                 EntityVelocityLimit);
-
-            CohesionJob cohesionJob = new CohesionJob(
-                _entitiesCount,
-                _entitiesPositions,
-                _entitiesAccelerations);
-
+            
             PointOfInterestJob pointOfInterestJob = new PointOfInterestJob(
-                _entitiesPositions, 
-                _entitiesAccelerations,
-                _pointsOfInterest);
-        
-            BoundsJob boundsJob = new BoundsJob(
+                _pointsOfInterest, 
                 _entitiesPositions, 
                 _entitiesAccelerations, 
-                _entitiesMovingBounds.size);
+                1.0f, 
+                0.1f);
 
             JobHandle boundsJobHandler = boundsJob.Schedule(_entitiesCount, 4);
-        
-            JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 4, boundsJobHandler); 
-        
+            JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 4, boundsJobHandler);
             JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, cohesionJobHandle);
-
             JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
             pointOfInterestJobHandle.Complete();
         }
