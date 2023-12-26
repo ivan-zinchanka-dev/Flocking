@@ -15,11 +15,12 @@ using Random = UnityEngine.Random;
 public class Flocking : MonoBehaviour
 {
     [SerializeField] private GameObject _entityPrefab;
-    [SerializeField] private float _entitiesVelocityLimit;
+    //[SerializeField] private float _entitiesVelocityLimit;
     [SerializeField] private int _sourceEntitiesCount = 50;
     [SerializeField] float _density = 0.15f;
     [SerializeField] private Bounds _entitiesMovingBounds;
     [field: SerializeField, Range(0.25f, 4.0f)] public float ReproductionRate { get; set; } = 1.0f;
+    [field: SerializeField, Range(1.0f, 10.0f)] public float EntityVelocityLimit { get; set; } = 10.0f;
     
     private int _entitiesCount;
     
@@ -43,7 +44,6 @@ public class Flocking : MonoBehaviour
 
     public int EntitiesCount => _entitiesCount;
     
-
     public event Action<int> OnEntitiesCountChanged; 
 
     public void Initialize(InterestsManager interestsManager)
@@ -91,7 +91,7 @@ public class Flocking : MonoBehaviour
         
         for (int i = 0; i < _entitiesCount; i++)
         {
-            _entitiesVelocities[i] = Random.insideUnitSphere * _entitiesVelocityLimit / 2;
+            _entitiesVelocities[i] = Random.insideUnitSphere * EntityVelocityLimit / 2;
         }
         
         _entitiesAccelerations = new NativeArray<Vector3>(_maxEntitiesCount, Allocator.Persistent);
@@ -170,7 +170,7 @@ public class Flocking : MonoBehaviour
             _entitiesVelocities, 
             _entitiesAccelerations, 
             Time.deltaTime, 
-            _entitiesVelocityLimit);
+            EntityVelocityLimit);
 
         CohesionJob cohesionJob = new CohesionJob(
             _entitiesCount,
