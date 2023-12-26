@@ -42,18 +42,7 @@ namespace Management
         {
             _interestsManager = interestsManager;
         }
-
-        private void UpdatePointsOfInterest()
-        {
-            if (_pointsOfInterest.IsCreated)
-            {
-                _interestsManager.UpdatePointsOfInterest(_pointsOfInterest);
-                _pointsOfInterest.Dispose();
-            }
         
-            _pointsOfInterest = _interestsManager.GetPointsOfInterest();
-        }
-
         private GameObject CreateEntity()
         {
             if (_cachedMinExtent < 0.0f)
@@ -71,6 +60,11 @@ namespace Management
         private Vector3 GetStartVelocity()
         {
             return Random.insideUnitSphere * Mathf.Sqrt(EntityVelocityLimit);
+        }
+
+        private static int GetInnerLoopBatchCount(int arrayLength)
+        {
+            return Mathf.CeilToInt(arrayLength / 4.0f);
         }
 
         private void Start()
@@ -154,7 +148,8 @@ namespace Management
                 5.0f,
                 1.0f);
 
-            JobHandle reproductionJobHandle = reproductionJob.Schedule(_entitiesCount, 4);
+            JobHandle reproductionJobHandle = reproductionJob.Schedule(_entitiesCount, 
+                GetInnerLoopBatchCount(_entitiesCount));
             reproductionJobHandle.Complete();
         }
     
@@ -188,6 +183,17 @@ namespace Management
             OnEntitiesCountChanged?.Invoke(_entitiesCount);
         }
     
+        private void UpdatePointsOfInterest()
+        {
+            if (_pointsOfInterest.IsCreated)
+            {
+                _interestsManager.UpdatePointsOfInterest(_pointsOfInterest);
+                _pointsOfInterest.Dispose();
+            }
+        
+            _pointsOfInterest = _interestsManager.GetPointsOfInterest();
+        }
+        
         private void Update()
         {
             UpdatePointsOfInterest();
@@ -218,10 +224,16 @@ namespace Management
                 1.0f, 
                 0.1f);
 
-            JobHandle boundsJobHandler = boundsJob.Schedule(_entitiesCount, 4);
-            JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 4, boundsJobHandler);
+            JobHandle boundsJobHandler = boundsJob.Schedule(_entitiesCount, 
+                GetInnerLoopBatchCount(_entitiesCount));
+            
+            JobHandle cohesionJobHandle = cohesionJob.Schedule(_entitiesCount, 
+                GetInnerLoopBatchCount(_entitiesCount), boundsJobHandler);
+            
             JobHandle moveJobHandle = moveJob.Schedule(_transformAccessArray, cohesionJobHandle);
-            JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 4, moveJobHandle);
+            
+            JobHandle pointOfInterestJobHandle = pointOfInterestJob.Schedule(_entitiesCount, 
+                GetInnerLoopBatchCount(_entitiesCount), moveJobHandle);
             pointOfInterestJobHandle.Complete();
         }
     
