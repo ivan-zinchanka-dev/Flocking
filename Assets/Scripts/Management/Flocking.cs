@@ -69,9 +69,6 @@ namespace Management
 
         private void Start()
         {
-            Debug.Log("True Byte: " + Convert.ToByte(true));
-            Debug.Log("False Byte: " + Convert.ToByte(false));
-            
             _entitiesCount = _sourceEntitiesCount;
             _entitiesTransforms = new Transform[MaxEntitiesCount];
 
