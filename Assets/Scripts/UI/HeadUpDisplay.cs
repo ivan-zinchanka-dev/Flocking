@@ -1,4 +1,5 @@
 ﻿using Management;
+using Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,24 +26,27 @@ namespace UI
         [SerializeField] 
         private Slider _reproductionRateSlider;
         
-        [Header("Dependencies")]
-        [SerializeField] 
-        private InterestsManager _interestsManager;
+        [Header("Dependencies")] 
         [SerializeField] 
         private Flocking _flocking;
-
+        [SerializeField]
+        private FlockingConfig _flockingConfig;
+        [SerializeField] 
+        private InterestsManager _interestsManager;
+        
         private const string ReproductionRateFormat = "Reproduction rate: {0:f2}";
         private const string VelocityLimitFormat = "Max entity speed: {0:f2}";
+        private const string TotalEntitiesFormat = "Total entities: {0}";
         
         private void Awake()
         {
             UpdateTotalEntitiesText(_flocking.EntitiesCount);
 
-            _velocityLimitSlider.value = _flocking.EntityVelocityLimit;
-            _velocityLimitTextMesh.text = string.Format(VelocityLimitFormat, _flocking.EntityVelocityLimit);
+            _velocityLimitSlider.value = _flockingConfig.EntityVelocityLimit;
+            _velocityLimitTextMesh.text = string.Format(VelocityLimitFormat, _flockingConfig.EntityVelocityLimit);
             
-            _reproductionRateSlider.value = _flocking.ReproductionRate;
-            _reproductionRateTextMesh.text = string.Format(ReproductionRateFormat, _flocking.ReproductionRate);
+            _reproductionRateSlider.value = _flockingConfig.ReproductionRate;
+            _reproductionRateTextMesh.text = string.Format(ReproductionRateFormat, _flockingConfig.ReproductionRate);
         }
 
         private void OnEnable()
@@ -55,7 +59,7 @@ namespace UI
 
         private void UpdateTotalEntitiesText(int count)
         {
-            _totalEntitiesTextMesh.text = "Total entities: " + count;
+            _totalEntitiesTextMesh.text = string.Format(TotalEntitiesFormat, count);
         }
 
         private void AddFood()
@@ -65,13 +69,13 @@ namespace UI
         
         private void UpdateVelocityLimit(float limit)
         {
-            _flocking.EntityVelocityLimit = limit;
+            _flockingConfig.EntityVelocityLimit = limit;
             _velocityLimitTextMesh.text = string.Format(VelocityLimitFormat, limit);
         }
         
         private void UpdateReproductionRate(float rate)
         {
-            _flocking.ReproductionRate = rate;
+            _flockingConfig.ReproductionRate = rate;
             _reproductionRateTextMesh.text = string.Format(ReproductionRateFormat, rate);
         }
         

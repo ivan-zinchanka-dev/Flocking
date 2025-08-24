@@ -14,14 +14,11 @@ namespace Management
         private Transform _pointOfInterestPrefab;
         
         [SerializeField] 
-        private Bounds _spawnBounds;
+        private Bounds _spawnBounds = new(Vector3.zero, new Vector3(43f, 28f, 43f));
 
         [SerializeField] 
         private int _startPointsCount = 3;
         
-        [SerializeField] 
-        private Flocking _flocking;
-
         private readonly Dictionary<Guid, Transform> _pointsOfInterest = new();
     
         private void Awake()
@@ -30,8 +27,6 @@ namespace Management
             {
                 SpawnPointOfInterest();
             }
-
-            _flocking.Initialize(this);
         }
 
         private Vector3 GetPositionInsideBounds()

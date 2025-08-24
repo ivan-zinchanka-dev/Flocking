@@ -14,28 +14,17 @@ namespace Management
     public class Flocking : MonoBehaviour
     {
         [SerializeField] 
-        private GameObject _entityPrefab;
+        private FlockingConfig _config;
         
         [SerializeField] 
-        private int _sourceEntitiesCount = 50;
+        private FlockingEntityFactory _entityFactory;
         
-        [SerializeField] 
-        private float _density = 0.15f;
+        [SerializeField]
+        private InterestsManager _interestsManager;
         
-        [SerializeField] 
-        private Bounds _entitiesMovingBounds;
-        
-        [field:SerializeField, Range(1.0f, 10.0f)] 
-        public float EntityVelocityLimit { get; set; } = 10.0f;
-        
-        [field:SerializeField, Range(0.25f, 4.0f)] 
-        public float ReproductionRate { get; set; } = 1.0f;
-    
         private const int MaxEntitiesCount = 1000;
         private int _entitiesCount;
-        private float _cachedMinExtent = -1.0f;
         private readonly CancellationTokenSource _reproductionCts = new();
-        private InterestsManager _interestsManager;
         
         private Transform[] _entitiesTransforms;
         private TransformAccessArray _transformAccessArray;
@@ -49,43 +38,24 @@ namespace Management
         public int EntitiesCount => _entitiesCount;
         public event Action<int> OnEntitiesCountChanged; 
         
-        public void Initialize(InterestsManager interestsManager)
-        {
-            _interestsManager = interestsManager;
-        }
-        
-        private GameObject CreateEntity()
-        {
-            if (_cachedMinExtent < 0.0f)
-            {
-                Vector3 boundsExtents = _entitiesMovingBounds.extents;
-                _cachedMinExtent = Mathf.Min(boundsExtents.x, boundsExtents.y, boundsExtents.z);
-            }
-            
-            return Instantiate(_entityPrefab, 
-                Random.insideUnitSphere * Mathf.Clamp(_entitiesCount * _density, 0.0f, _cachedMinExtent),
-                Quaternion.Euler(Vector3.forward * Random.Range(0.0f, 360.0f)), 
-                transform);
-        }
-
-        private Vector3 GetStartVelocity()
-        {
-            return Random.insideUnitSphere * Mathf.Sqrt(EntityVelocityLimit);
-        }
-
         private static int GetInnerLoopBatchCount(int arrayLength)
         {
             return Mathf.CeilToInt(arrayLength / 4.0f);
         }
 
+        private Vector3 GetStartVelocity()
+        {
+            return Random.insideUnitSphere * Mathf.Sqrt(_config.EntityVelocityLimit);
+        }
+        
         private void Start()
         {
-            _entitiesCount = _sourceEntitiesCount;
+            _entitiesCount = _config.SourceEntitiesCount;
             _entitiesTransforms = new Transform[MaxEntitiesCount];
 
             for (int i = 0; i < _entitiesCount; i++)
             {
-                GameObject entity = CreateEntity();
+                GameObject entity = _entityFactory.CreateEntity(_entitiesCount);
                 entity.name = $"entity_{i}";
                 _entitiesTransforms[i] = entity.transform;
             }
@@ -117,12 +87,12 @@ namespace Management
         {
             while (!_reproductionCts.IsCancellationRequested)
             {
-                if (ReproductionRate == 0)
+                if (_config.ReproductionRate == 0)
                 {
                     continue;
                 }
 
-                await UniTask.Delay(TimeSpan.FromSeconds(1.0f / ReproductionRate));
+                await UniTask.Delay(TimeSpan.FromSeconds(1.0f / _config.ReproductionRate));
                 TryMakeReproduction();
             }
         }
@@ -168,7 +138,7 @@ namespace Management
         
             for (int i = _entitiesCount; i < newEntitiesCount; i++)
             {
-                GameObject entity = CreateEntity();
+                GameObject entity = _entityFactory.CreateEntity(_entitiesCount);
                 entity.name = $"entity_{i}_generated";
                 _entitiesTransforms[i] = entity.transform;
             }
@@ -210,7 +180,7 @@ namespace Management
             BoundsJob boundsJob = new BoundsJob(
                 _entitiesPositions, 
                 _entitiesAccelerations, 
-                _entitiesMovingBounds.size);
+                _config.EntitiesMovingBounds.size);
             
             CohesionJob cohesionJob = new CohesionJob(
                 _entitiesCount,
@@ -224,7 +194,7 @@ namespace Management
                 _entitiesVelocities, 
                 _entitiesAccelerations, 
                 Time.deltaTime, 
-                EntityVelocityLimit);
+                _config.EntityVelocityLimit);
             
             PointOfInterestJob pointOfInterestJob = new PointOfInterestJob(
                 _pointsOfInterest, 
@@ -248,7 +218,7 @@ namespace Management
     
         private void OnDrawGizmos()
         {
-            Gizmos.DrawWireCube(_entitiesMovingBounds.center, _entitiesMovingBounds.size);
+            Gizmos.DrawWireCube(_config.EntitiesMovingBounds.center, _config.EntitiesMovingBounds.size);
         }
     
         private void OnDestroy()
