@@ -8,7 +8,8 @@ namespace Jobs
     [BurstCompile]
     public struct BoundsJob : IJobParallelFor
     {
-        [ReadOnly] private NativeArray<Vector3> _positions;
+        [ReadOnly] 
+        private NativeArray<Vector3> _positions;
         private NativeArray<Vector3> _accelerations;
         private readonly Vector3 _size;
 

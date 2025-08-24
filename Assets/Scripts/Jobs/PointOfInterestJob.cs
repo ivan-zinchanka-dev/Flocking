@@ -1,3 +1,4 @@
+using Constants;
 using Models;
 using Unity.Burst;
 using Unity.Collections;
@@ -9,15 +10,22 @@ namespace Jobs
     [BurstCompile]
     public struct PointOfInterestJob : IJobParallelFor
     {
-        [NativeDisableParallelForRestriction] private NativeArray<PointOfInterest> _pointsOfInterest;
+        [NativeDisableParallelForRestriction] 
+        private NativeArray<PointOfInterest> _pointsOfInterest;
         
-        [ReadOnly] private NativeArray<Vector3> _positions;
+        [ReadOnly] 
+        private NativeArray<Vector3> _positions;
         private NativeArray<Vector3> _accelerations;
-
+        
         private readonly float _consumeRadius;
         private readonly float _accelerationWeight;
         
-        public PointOfInterestJob(NativeArray<PointOfInterest> pointsOfInterest, NativeArray<Vector3> positions, NativeArray<Vector3> accelerations, float consumeRadius, float accelerationWeight)
+        public PointOfInterestJob(
+            NativeArray<PointOfInterest> pointsOfInterest, 
+            NativeArray<Vector3> positions, 
+            NativeArray<Vector3> accelerations, 
+            float consumeRadius, 
+            float accelerationWeight)
         {
             _pointsOfInterest = pointsOfInterest;
             _positions = positions;
@@ -50,12 +58,12 @@ namespace Jobs
             if (Vector3.Distance(_positions[index], _pointsOfInterest[chosenPointIndex].Position) < _consumeRadius)
             {
                 PointOfInterest cachedPoint = _pointsOfInterest[chosenPointIndex];
-                _pointsOfInterest[chosenPointIndex] = new PointOfInterest(cachedPoint.Id, cachedPoint.Position, 1);
+                _pointsOfInterest[chosenPointIndex] = 
+                    new PointOfInterest(cachedPoint.Id, cachedPoint.Position, Bytes.True);
             }
 
             Vector3 acceleration = _pointsOfInterest[chosenPointIndex].Position - _positions[index];
             _accelerations[index] += _accelerationWeight * acceleration;
-            
         }
     }
 }

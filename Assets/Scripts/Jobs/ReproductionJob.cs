@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Constants;
+using Models;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -9,17 +10,26 @@ namespace Jobs
     [BurstCompile]
     public struct ReproductionJob : IJobParallelFor
     {
-        private readonly float _entitiesCount;
-        [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<Vector3> _positions;
-        [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<PointOfInterest> _pointsOfInterest;
-        [NativeDisableParallelForRestriction] private NativeArray<byte> _reproductionResults;
+        [ReadOnly, NativeDisableParallelForRestriction] 
+        private NativeArray<Vector3> _positions;
         
+        [ReadOnly, NativeDisableParallelForRestriction] 
+        private NativeArray<PointOfInterest> _pointsOfInterest;
+        
+        [NativeDisableParallelForRestriction] 
+        private NativeArray<byte> _reproductionResults;
+        
+        private readonly float _entitiesCount;
         private readonly float _reproductionZoneRadius;
         private readonly float _reproductionContactRadius;
 
-        public ReproductionJob(float entitiesCount, NativeArray<Vector3> positions, 
-            NativeArray<PointOfInterest> pointsOfInterest, NativeArray<byte> reproductionResults, 
-            float reproductionZoneRadius, float reproductionContactRadius)
+        public ReproductionJob(
+            float entitiesCount, 
+            NativeArray<Vector3> positions, 
+            NativeArray<PointOfInterest> pointsOfInterest, 
+            NativeArray<byte> reproductionResults, 
+            float reproductionZoneRadius, 
+            float reproductionContactRadius)
         {
             _entitiesCount = entitiesCount;
             _positions = positions;
@@ -31,7 +41,7 @@ namespace Jobs
 
         public void Execute(int index)
         {
-            if (_reproductionResults[index] == 1)
+            if (_reproductionResults[index] == Bytes.True)
             {
                 return;
             }
@@ -64,11 +74,10 @@ namespace Jobs
                 
                 if (Vector3.Distance(selfPosition, otherPosition) < _reproductionContactRadius)
                 {
-                    _reproductionResults[index] = _reproductionResults[i] = 1;
+                    _reproductionResults[index] = _reproductionResults[i] = Bytes.True;
                     break;
                 }
             }
-            
         }
     }
 }

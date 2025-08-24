@@ -12,10 +12,15 @@ namespace Jobs
         private readonly float _coverageRadius;
         private readonly float _thresholdRadius;
         
-        [ReadOnly][NativeDisableParallelForRestriction] private NativeArray<Vector3> _positions;
+        [ReadOnly, NativeDisableParallelForRestriction] 
+        private NativeArray<Vector3> _positions;
         private NativeArray<Vector3> _accelerations;
         
-        public CohesionJob(float entitiesCount, float coverageRadius, float thresholdRadius, NativeArray<Vector3> positions, 
+        public CohesionJob(
+            float entitiesCount, 
+            float coverageRadius, 
+            float thresholdRadius, 
+            NativeArray<Vector3> positions, 
             NativeArray<Vector3> accelerations)
         {
             _entitiesCount = entitiesCount;
@@ -64,7 +69,6 @@ namespace Jobs
             {
                 _accelerations[index] += averageAvoidPosition / avoidableNeighboursCount;
             }
-
         }
     }
 }

@@ -4,7 +4,8 @@ namespace ColorRandomization
 {
     public class RendererColorRandomizer : BaseColorRandomizer
     {
-        [SerializeField] private Renderer _renderer;
+        [SerializeField] 
+        private Renderer _renderer;
     
         private void Awake()
         {

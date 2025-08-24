@@ -8,18 +8,28 @@ namespace UI
     public class HeadUpDisplay : MonoBehaviour
     {
         [Header("Components")]
-        [SerializeField] private TextMeshProUGUI _totalEntitiesTextMesh;
-        [SerializeField] private Button _addFoodButton;
+        [SerializeField] 
+        private TextMeshProUGUI _totalEntitiesTextMesh;
+        [SerializeField] 
+        private Button _addFoodButton;
+        
         [Space]
-        [SerializeField] private TextMeshProUGUI _velocityLimitTextMesh;
-        [SerializeField] private Slider _velocityLimitSlider;
+        [SerializeField] 
+        private TextMeshProUGUI _velocityLimitTextMesh;
+        [SerializeField] 
+        private Slider _velocityLimitSlider;
+        
         [Space]
-        [SerializeField] private TextMeshProUGUI _reproductionRateTextMesh;
-        [SerializeField] private Slider _reproductionRateSlider;
+        [SerializeField] 
+        private TextMeshProUGUI _reproductionRateTextMesh;
+        [SerializeField] 
+        private Slider _reproductionRateSlider;
         
         [Header("Dependencies")]
-        [SerializeField] private InterestsManager _interestsManager;
-        [SerializeField] private Flocking _flocking;
+        [SerializeField] 
+        private InterestsManager _interestsManager;
+        [SerializeField] 
+        private Flocking _flocking;
 
         private const string ReproductionRateFormat = "Reproduction rate: {0:f2}";
         private const string VelocityLimitFormat = "Max entity speed: {0:f2}";

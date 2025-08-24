@@ -4,7 +4,8 @@ namespace ColorRandomization
 {
     public class LightColorRandomizer : BaseColorRandomizer
     {
-        [SerializeField] private Light _light;
+        [SerializeField] 
+        private Light _light;
     
         private void Awake()
         {

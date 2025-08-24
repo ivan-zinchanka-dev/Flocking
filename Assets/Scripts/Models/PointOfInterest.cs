@@ -15,10 +15,5 @@ namespace Models
             Position = position;
             IsConsumed = isConsumed;
         }
-
-        public void Consume()
-        {
-            IsConsumed = 1;
-        }
     }
 }

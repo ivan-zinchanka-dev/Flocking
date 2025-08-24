@@ -5,13 +5,16 @@ namespace ColorRandomization
 {
     public abstract class BaseColorRandomizer : MonoBehaviour
     {
-        [SerializeField] private Color _min;
-        [SerializeField] private Color _max;
+        [SerializeField] 
+        private Color _min;
+        
+        [SerializeField] 
+        private Color _max;
 
         protected Color GetRandomColor()
         {
-            Color.RGBToHSV(_min, out var minH, out var minS, out var minV);
-            Color.RGBToHSV(_max, out var maxH, out var maxS, out var maxV);
+            Color.RGBToHSV(_min, out float minH, out float minS, out float minV);
+            Color.RGBToHSV(_max, out float maxH, out float maxS, out float maxV);
             
             return Random.ColorHSV(minH, maxH, minS, maxS, minV, maxV);
         }

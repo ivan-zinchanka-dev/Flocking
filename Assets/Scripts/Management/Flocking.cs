@@ -13,18 +13,30 @@ namespace Management
 {
     public class Flocking : MonoBehaviour
     {
-        [SerializeField] private GameObject _entityPrefab;
-        [SerializeField] private int _sourceEntitiesCount = 50;
-        [SerializeField] float _density = 0.15f;
-        [SerializeField] private Bounds _entitiesMovingBounds;
-        [field:SerializeField, Range(1.0f, 10.0f)] public float EntityVelocityLimit { get; set; } = 10.0f;
-        [field:SerializeField, Range(0.25f, 4.0f)] public float ReproductionRate { get; set; } = 1.0f;
+        [SerializeField] 
+        private GameObject _entityPrefab;
+        
+        [SerializeField] 
+        private int _sourceEntitiesCount = 50;
+        
+        [SerializeField] 
+        private float _density = 0.15f;
+        
+        [SerializeField] 
+        private Bounds _entitiesMovingBounds;
+        
+        [field:SerializeField, Range(1.0f, 10.0f)] 
+        public float EntityVelocityLimit { get; set; } = 10.0f;
+        
+        [field:SerializeField, Range(0.25f, 4.0f)] 
+        public float ReproductionRate { get; set; } = 1.0f;
     
         private const int MaxEntitiesCount = 1000;
         private int _entitiesCount;
-        public int EntitiesCount => _entitiesCount;
-        public event Action<int> OnEntitiesCountChanged; 
-    
+        private float _cachedMinExtent = -1.0f;
+        private readonly CancellationTokenSource _reproductionCts = new();
+        private InterestsManager _interestsManager;
+        
         private Transform[] _entitiesTransforms;
         private TransformAccessArray _transformAccessArray;
         private NativeArray<PointOfInterest> _pointsOfInterest;
@@ -33,10 +45,9 @@ namespace Management
         private NativeArray<Vector3> _entitiesVelocities;
         private NativeArray<Vector3> _entitiesAccelerations;
         private NativeArray<byte> _reproductionResults;
-    
-        private readonly CancellationTokenSource _reproductionCts = new CancellationTokenSource();
-        private InterestsManager _interestsManager;
-        private float _cachedMinExtent = -1.0f;
+        
+        public int EntitiesCount => _entitiesCount;
+        public event Action<int> OnEntitiesCountChanged; 
         
         public void Initialize(InterestsManager interestsManager)
         {
@@ -75,12 +86,11 @@ namespace Management
             for (int i = 0; i < _entitiesCount; i++)
             {
                 GameObject entity = CreateEntity();
-                entity.name = "entity_" + i;
+                entity.name = $"entity_{i}";
                 _entitiesTransforms[i] = entity.transform;
             }
 
             _transformAccessArray = new TransformAccessArray(_entitiesTransforms);
-        
             _entitiesPositions = new NativeArray<Vector3>(MaxEntitiesCount, Allocator.Persistent);
         
             for (int i = 0; i < _entitiesCount; i++)
@@ -96,7 +106,6 @@ namespace Management
             }
         
             _entitiesAccelerations = new NativeArray<Vector3>(MaxEntitiesCount, Allocator.Persistent);
-
             _reproductionResults = new NativeArray<byte>(MaxEntitiesCount, Allocator.Persistent);
             _pointsOfInterest = _interestsManager.GetPointsOfInterest();
         

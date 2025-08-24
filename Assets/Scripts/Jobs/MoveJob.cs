@@ -14,8 +14,12 @@ namespace Jobs
         private readonly float _deltaTime;
         private readonly float _velocityLimit;
 
-        public MoveJob(NativeArray<Vector3> positions, NativeArray<Vector3> velocities, NativeArray<Vector3> accelerations,
-            float deltaTime, float velocityLimit)
+        public MoveJob(
+            NativeArray<Vector3> positions, 
+            NativeArray<Vector3> velocities, 
+            NativeArray<Vector3> accelerations,
+            float deltaTime, 
+            float velocityLimit)
         {
             _positions = positions;
             _velocities = velocities;

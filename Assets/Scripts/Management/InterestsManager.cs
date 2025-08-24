@@ -10,15 +10,23 @@ namespace Management
 {
     public class InterestsManager : MonoBehaviour
     {
-        [SerializeField] private Transform _pointOfInterestPrefab;
-        [SerializeField] private Bounds _spawnBounds;
-        [SerializeField] private Flocking _flocking;
+        [SerializeField] 
+        private Transform _pointOfInterestPrefab;
+        
+        [SerializeField] 
+        private Bounds _spawnBounds;
 
-        private readonly Dictionary<Guid, Transform> _pointsOfInterest = new Dictionary<Guid, Transform> ();
+        [SerializeField] 
+        private int _startPointsCount = 3;
+        
+        [SerializeField] 
+        private Flocking _flocking;
+
+        private readonly Dictionary<Guid, Transform> _pointsOfInterest = new();
     
         private void Awake()
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < _startPointsCount; i++)
             {
                 SpawnPointOfInterest();
             }
@@ -42,7 +50,6 @@ namespace Management
 
             Guid pointId = Guid.NewGuid();
             _pointsOfInterest[pointId] = pointOfInterest;
-        
         }
     
         public NativeArray<PointOfInterest> GetPointsOfInterest()
@@ -60,9 +67,8 @@ namespace Management
                 {
                     Guid pointId = pointOfInterests[i].Id;
             
-                    if (_pointsOfInterest.TryGetValue(pointId, out Transform point))
+                    if (_pointsOfInterest.Remove(pointId, out Transform point))
                     {
-                        _pointsOfInterest.Remove(pointId);
                         Destroy(point.gameObject);
                     }
                 }
